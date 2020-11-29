@@ -1,6 +1,6 @@
 <launch>
 
-    <rosparam file="low_level_control.yaml" command="load"/>
+    <rosparam file="$(find robopi_low_level_control)/config/low_level_control.yaml" command="load"/>
 
     <node name="robot_arm_controller_spawner" pkg="controller_manager" type="spawner"
           respawn="true" output="screen"
@@ -9,7 +9,7 @@
 
     <arg name="node_start_delay" default="5.0" />
 
-    <node name="actuator_interface" pkg="robopi_hardware_interface" type="actuator_interface_node" output="screen"/>
+    <node name="actuator_interface" pkg="robopi_low_level_control" type="actuator_interface_node" output="screen"/>
 
 
 </launch>
