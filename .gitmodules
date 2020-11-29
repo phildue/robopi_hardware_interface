@@ -1,0 +1,3 @@
+[submodule "drivers/pi-ln298n"]
+	path = src/drivers/pi-ln298n
+	url = https://github.com/phildue/pi-ln298n

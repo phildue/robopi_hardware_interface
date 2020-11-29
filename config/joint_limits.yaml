@@ -1,0 +1,39 @@
+joint_limits:
+  wheel_left:
+    has_position_limits: false
+    has_velocity_limits: true
+    min_velocity: -1.0
+    max_velocity: 1.0
+    has_acceleration_limits: false
+    min_acceleration: -1.0
+    max_acceleration: 1.0
+    has_jerk_limits: false
+    max_jerk: 0.1
+    min_jerk: -0.1
+    has_effort_limits: true
+    max_effort: 1.0
+    min_effort: -1.0
+    has_soft_limits: true
+    soft_lower_limit: -0.95
+    soft_upper_limit: 0.95
+    k_position: 10.0
+    k_velocity: 10.0
+  wheel_right:
+    has_position_limits: false
+    has_velocity_limits: true
+    min_velocity: -1.0
+    max_velocity: 1.0
+    has_acceleration_limits: false
+    min_acceleration: -1.0
+    max_acceleration: 1.0
+    has_jerk_limits: false
+    max_jerk: 0.01
+    min_jerk: -0.01
+    has_effort_limits: true
+    max_effort: 1.0
+    min_effort: -1.0
+    has_soft_limits: true
+    soft_lower_limit: -0.95
+    soft_upper_limit: 0.95
+    k_position: 10.0
+    k_velocity: 10.0

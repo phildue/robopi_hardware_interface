@@ -1,0 +1,5 @@
+<launch>
+    <arg name="node_start_delay" default="5.0" />
+    <node name="gpio_motor" pkg="diff_drive" type="gpio_motor_node" output="screen"/>
+    <node name="motor_cmd_pub" pkg="diff_drive" launch-prefix="bash -c 'sleep $(arg node_start_delay); $0 $@' " type="motor_cmd_pub_node" respawn="false" output="screen" ns="/"/>
+</launch>

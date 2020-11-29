@@ -1,0 +1,16 @@
+<launch>
+
+    <arg name="model" default="$(find diff_drive)/urdf/02-diff_drive.urdf.xacro"/>
+
+
+    <rosparam file="$(find diff_drive)/config/hardware.yaml" command="load"/>
+
+    <arg name="node_start_delay" default="5.0" />
+    <node name="actuator_interface" pkg="diff_drive" type="actuator_interface_node" output="screen"/>
+
+
+</launch>
+
+
+
+
