@@ -123,7 +123,8 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-set(COMPILE_FOR_PI ON)
+set(COMPILE_FOR_PI CACHE BOOL ON "Enable if compiled on raspberry pi")
+
 add_subdirectory(src/drivers/pi-ln298n)
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context

@@ -2,7 +2,7 @@
 
     <rosparam file="$(find robopi_low_level_control)/config/low_level_control.yaml" command="load"/>
 
-    <node name="robot_arm_controller_spawner" pkg="controller_manager" type="spawner"
+    <node name="low_level_control_spawner" pkg="controller_manager" type="spawner"
           respawn="true" output="screen"
           args="/robopi/joint_state_controller
                 /robopi/diff_drive_controller"/>
