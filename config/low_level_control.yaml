@@ -1,4 +1,4 @@
-Diff_Drive:
+robopi:
   diff_drive_controller:
      type: "diff_drive_controller/DiffDriveController"
      publish_rate: 50
@@ -30,3 +30,34 @@ Diff_Drive:
          max_velocity           : 1   # rad/s
          has_acceleration_limits: true
          max_acceleration       : 3   # rad/s^2
+
+  joint_state_controller:
+    type: "joint_state_controller/JointStateController"
+    publish_rate: 50
+
+  actuator_interface:
+    loop_hz: 50 # hz
+    interface_type: "velocity"
+    wheels:
+      - left_front_wheel_joint
+      - left_back_wheel_joint
+      - right_front_wheel_joint
+      - right_back_wheel_joint
+  gpio_wheels:
+    #from gpio wiring
+    left_front_wheel_joint:
+      en: 21
+      inF: 20
+      inB: 16
+    left_back_wheel_joint:
+      en: 21
+      inF: 20
+      inB: 16
+    right_front_wheel_joint:
+      en: 13
+      inF: 19
+      inB: 26
+    right_back_wheel_joint:
+      en: 13
+      inF: 19
+      inB: 26
