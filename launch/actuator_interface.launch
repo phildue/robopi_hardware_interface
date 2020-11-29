@@ -2,9 +2,9 @@
 
 
 
-    <rosparam file="$(find diff_drive)/config/joint_states.yaml" command="load"/>
+    <rosparam file="$(find robopi_hardware_interface)/config/joint_states.yaml" command="load"/>
 
-    <rosparam file="$(find diff_drive)/config/diff_drive.yaml" command="load"/>
+    <rosparam file="$(find robopi_hardware_interface)/config/diff_drive.yaml" command="load"/>
 
     <node name="robot_arm_controller_spawner" pkg="controller_manager" type="spawner"
           respawn="true" output="screen"
