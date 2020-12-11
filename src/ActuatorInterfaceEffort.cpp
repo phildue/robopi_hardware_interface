@@ -26,6 +26,8 @@ ActuatorInterfaceEffort::ActuatorInterfaceEffort(ros::NodeHandle &nh) : _nh(nh)
 void ActuatorInterfaceEffort::init()
 {
     _nh.getParam("/robopi/actuator_interface/wheels", _wheelNames);
+    _piGpio = std::make_shared<pi_ln298n::PiGpio>();
+
     for(const auto &wheelName : _wheelNames)
     {
         ROS_INFO("Found wheel: [%s]",wheelName.c_str());
@@ -33,7 +35,7 @@ void ActuatorInterfaceEffort::init()
         _nh.getParam("/robopi/gpio_wheels/" + wheelName + "/en", en);
         _nh.getParam("/robopi/gpio_wheels/" + wheelName + "/inF", inF);
         _nh.getParam("/robopi/gpio_wheels/" + wheelName + "/inB", inB);
-        _wheels.insert({wheelName, pi_ln298n::GpioMotor(inF, inB, en)});
+        _wheels.insert({wheelName, pi_ln298n::MotorLn298(inF, inB, en,_piGpio)});
     }
     _numJoints = _wheelNames.size();
 

@@ -33,7 +33,7 @@ public:
     void write(ros::Duration elapsed_time);
 
 protected:
-    std::map<std::string,pi_ln298n::GpioMotor> _wheels;
+    std::map<std::string,pi_ln298n::MotorLn298> _wheels;
     std::vector<double> _jointEffort,_jointPosition,_jointVelocity;
     std::vector<double> _jointVelocityCommand;
     ros::NodeHandle _nh;
@@ -48,6 +48,8 @@ protected:
     double _loopHz;
     std::shared_ptr<controller_manager::ControllerManager> _ctrlManager;
     double p_error_, v_error_, e_error_;
+
+    std::shared_ptr<pi_ln298n::PiGpio> _piGpio;
 };
 
 
