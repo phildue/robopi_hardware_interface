@@ -125,7 +125,7 @@ include_directories(
 
 set(COMPILE_FOR_PI CACHE BOOL ON "Enable if compiled on raspberry pi")
 
-add_subdirectory(src/drivers/pi-ln298n)
+add_subdirectory(src/robopi_drivers)
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
@@ -134,22 +134,27 @@ add_executable(actuator_interface_node src/actuator_interface_node.cpp src/Actua
 add_executable(test_publisher_node src/test_publisher_node.cpp)
 add_executable(gpio_motor_node src/gpio_motor_node.cpp)
 add_executable(motor_cmd_pub_node src/motor_cmd_pub_node.cpp)
+add_executable(sonar_node src/sonar_node.cpp)
 
 target_link_libraries(actuator_interface_node
         ${catkin_LIBRARIES}
-        pi_ln298n
+        robopi_drivers
         )
 target_link_libraries(test_publisher_node
         ${catkin_LIBRARIES}
-        pi_ln298n
+        robopi_drivers
         )
 target_link_libraries(gpio_motor_node
         ${catkin_LIBRARIES}
-        pi_ln298n
+        robopi_drivers
         )
 target_link_libraries(motor_cmd_pub_node
         ${catkin_LIBRARIES}
-        pi_ln298n
+        robopi_drivers
+        )
+target_link_libraries(sonar_node
+        ${catkin_LIBRARIES}
+        robopi_drivers
         )
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries

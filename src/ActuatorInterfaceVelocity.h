@@ -15,7 +15,7 @@
 #include <controller_manager/controller_manager.h>
 #include <boost/scoped_ptr.hpp>
 #include <ros/ros.h>
-#include <pi_ln298n/pi_ln298n.h>
+#include <robopi_drivers/robopi_drivers.h>
 #include <thread>
 using namespace hardware_interface;
 using joint_limits_interface::JointLimits;
@@ -33,7 +33,7 @@ public:
     void write(ros::Duration elapsed_time);
 
 protected:
-    std::map<std::string,pi_ln298n::MotorLn298> _wheels;
+    std::map<std::string,robopi::MotorLn298> _wheels;
     std::vector<double> _jointEffort,_jointPosition,_jointVelocity;
     std::vector<double> _jointVelocityCommand;
     ros::NodeHandle _nh;
@@ -49,7 +49,6 @@ protected:
     std::shared_ptr<controller_manager::ControllerManager> _ctrlManager;
     double p_error_, v_error_, e_error_;
 
-    std::shared_ptr<pi_ln298n::PiGpio> _piGpio;
 };
 
 

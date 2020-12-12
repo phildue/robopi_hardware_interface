@@ -1,15 +1,19 @@
 <launch>
+    <arg name="start_hardware_interface" default="false"/>
 
     <rosparam file="$(find robopi_low_level_control)/config/low_level_control.yaml" command="load"/>
+    <rosparam file="$(find robopi_low_level_control)/config/sonar.yaml" command="load"/>
 
     <node name="low_level_control_spawner" pkg="controller_manager" type="spawner"
           respawn="true" output="screen"
           args="/robopi/joint_state_controller
                 /robopi/diff_drive_controller"/>
 
-    <arg name="node_start_delay" default="5.0" />
-
-    <node name="actuator_interface" pkg="robopi_low_level_control" type="actuator_interface_node" output="screen"/>
+    <group if="$(eval arg('start_hardware_interface') == true)">
+        <arg name="node_start_delay" default="5.0" />
+        <node name="actuator_interface" pkg="robopi_low_level_control" type="actuator_interface_node" output="screen"/>
+        <node name="sonar" pkg="robopi_low_level_control" type="sonar_node" output="screen"/>
+    </group>
 
 
 </launch>

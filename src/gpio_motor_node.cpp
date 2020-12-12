@@ -2,7 +2,7 @@
 // Created by phil on 21.03.20.
 //
 #include <ros/ros.h>
-#include <pi_ln298n/pi_ln298n.h>
+#include <robopi_drivers/robopi_drivers.h>
 #include <chrono>
 #include "std_msgs/Float32.h"
 constexpr int enA = 21;
@@ -11,7 +11,7 @@ constexpr int in1 = 20;
 constexpr int in2 = 16;
 constexpr int in3 = 26;
 constexpr int in4 = 19;
-using namespace pi_ln298n;
+using namespace robopi;
 std::shared_ptr<MotorLn298> left,right;
 
 void leftCallBack(const std_msgs::Float32::ConstPtr& msg)
@@ -33,10 +33,9 @@ int main(int argc, char **argv)
     ros::init(argc, argv, "gpio_motor");
     ros::NodeHandle n("~");
     ros::Rate loop_rate(50);
-    auto piGpio = std::make_shared<pi_ln298n::PiGpio>();
 
-    left = std::make_shared<MotorLn298>(in4, in3, enB,piGpio);
-    right = std::make_shared<MotorLn298>(in1, in2, enA,piGpio);
+    left = std::make_shared<MotorLn298>(in4, in3, enB);
+    right = std::make_shared<MotorLn298>(in1, in2, enA);
 
     ros::Subscriber subLeft = n.subscribe("gpio_left", 10, leftCallBack);
     ros::Subscriber subRight = n.subscribe("gpio_right", 10, rightCallBack);
