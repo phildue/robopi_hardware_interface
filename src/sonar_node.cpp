@@ -38,7 +38,7 @@ int main(int argc, char **argv)
     range_left.max_range = 4.0;
 
 
-    robopi::SonarHcsr04 sonar(n.param("robopi/sonar/trigger",21),n.param("robopi/sonar/echo",32));
+    robopi::SonarHcsr04 sonar(n.param("robopi/sonar/trigger",6),n.param("robopi/sonar/echo",12));
 
     while (ros::ok())
     {

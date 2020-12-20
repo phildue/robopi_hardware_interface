@@ -2,5 +2,5 @@ robopi:
   sonar:
     publish_rate: 50
     #from gpio wiring
-    trigger: 31
-    echo: 32
+    trigger: 6
+    echo: 12
