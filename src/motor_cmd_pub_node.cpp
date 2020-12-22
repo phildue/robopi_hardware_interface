@@ -89,8 +89,8 @@ int main(int argc, char **argv)
          */
         std_msgs::Float32 msgLeft,msgRight;
 
-        msgLeft.data = setPoint;
-        msgRight.data = -1.0*setPoint;
+        msgLeft.data = setPoint*17.0;
+        msgRight.data = -1.0*setPoint*16.0;
 
         setPoint += increment;
 
