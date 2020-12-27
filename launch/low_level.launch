@@ -1,8 +1,9 @@
 <launch>
     <arg name="start_hardware_interface" default="false"/>
 
-    <rosparam file="$(find robopi_low_level_control)/config/low_level_control.yaml" command="load"/>
-    <rosparam file="$(find robopi_low_level_control)/config/sonar.yaml" command="load"/>
+    <rosparam file="$(find robopi_low_level)/config/control.yaml" command="load"/>
+    <rosparam file="$(find robopi_low_level)/config/sonar.yaml" command="load"/>
+    <rosparam file="$(find robopi_low_level)/config/wheels.yaml" command="load"/>
 
     <node name="low_level_control_spawner" pkg="controller_manager" type="spawner"
           respawn="true" output="screen"

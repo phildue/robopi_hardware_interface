@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(robopi_low_level_control)
+project(robopi_low_level)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -107,7 +107,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES robopi_low_level_control
+#  LIBRARIES robopi_low_level
 #  CATKIN_DEPENDS controller_manager joint_effort_controller joint_state_controller roscpp rospy std_msgs tf
 #  DEPENDS system_lib
 )
@@ -164,7 +164,7 @@ target_link_libraries(sonar_node
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-# add_executable(${PROJECT_NAME}_node src/robopi_low_level_control_node.cpp)
+# add_executable(${PROJECT_NAME}_node src/robopi_low_level_node.cpp)
 
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
@@ -228,7 +228,7 @@ target_link_libraries(sonar_node
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_robopi_low_level_control.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_robopi_low_level.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

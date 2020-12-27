@@ -1,3 +1,23 @@
+robopi:
+  gpio_wheels:
+    #from gpio wiring
+    left_front_wheel_joint:
+      en: 21
+      inF: 20
+      inB: 16
+    left_back_wheel_joint:
+      en: 21
+      inF: 20
+      inB: 16
+    right_front_wheel_joint:
+      en: 13
+      inF: 19
+      inB: 26
+    right_back_wheel_joint:
+      en: 13
+      inF: 19
+      inB: 26
+
 joint_limits:
   wheel_left:
     has_position_limits: false
