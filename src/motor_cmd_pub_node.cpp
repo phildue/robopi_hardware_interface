@@ -26,10 +26,18 @@
  */
 #include "ros/ros.h"
 #include "std_msgs/String.h"
-#include "std_msgs/Float32.h"
+#include <std_msgs/Float32MultiArray.h>
+#include <sensor_msgs/JointState.h>
 
 #include <sstream>
 
+void callback(const sensor_msgs::JointState::ConstPtr& msg)
+{
+    std::stringstream ss;
+     ss << msg;
+    ROS_INFO("Received: v = [%f,%f], s = [%f,%f], seq = %d", msg->velocity[0],msg->velocity[1],msg->position[0],msg->position[0],msg->header.seq);
+
+}
 /**
  * This tutorial demonstrates simple sending of messages over the ROS system.
  */
@@ -45,7 +53,7 @@ int main(int argc, char **argv)
      * You must call one of the versions of ros::init() before using any other
      * part of the ROS system.
      */
-    ros::init(argc, argv, "motor_control");
+    ros::init(argc, argv, "motor_control_host");
 
     /**
      * NodeHandle is the main access point to communications with the ROS system.
@@ -71,35 +79,50 @@ int main(int argc, char **argv)
      * than we can send them, the number here specifies how many messages to
      * buffer up before throwing some away.
      */
-    ros::Publisher left_pub = n.advertise<std_msgs::Float32>("gpio_motor/gpio_left", 10);
-    ros::Publisher right_pub = n.advertise<std_msgs::Float32>("gpio_motor/gpio_right", 10);
-
-    ros::Rate loop_rate(0.5);
+    ros::Publisher pub = n.advertise<std_msgs::Float32MultiArray>("motor_control/cmd_vel", 1);
+ //   ros::Publisher right_pub = n.advertise<std_msgs::Float64>("motor_control/setpoint/right", 1);
+   // ros::Publisher right_pub = n.advertise<std_msgs::Float64>("motor_control/setpoint/right", 1);
+    // ros::Subscriber _sub  = n.subscribe("motor_control/joint_state",10,&callback);
+    ros::Rate loop_rate(0.15);
 
     /**
      * A count of how many messages we have sent. This is used to create
      * a unique string for each message.
      */
      float setPoint = 0.1;
-     float increment = 0.1;
+     float increment = 0.05;
     while (ros::ok())
     {
         /**
          * This is a message object. You stuff it with data, and then publish it.
          */
-        std_msgs::Float32 msgLeft,msgRight;
-
+  /*      std_msgs::Floa msgLeft,msgRight;
         msgLeft.data = setPoint*17.0;
-        msgRight.data = -1.0*setPoint*16.0;
+
+        msgRight.data =-1.0*setPoint*17.0;
+*/
+        std_msgs::MultiArrayDimension left,right;
+        left.size = 1;
+        left.label = "l";
+        left.stride = 1;
+        right.label = "r";
+        right.size = 1;
+        right.stride = 1;
+
+        std_msgs::Float32MultiArray msg;
+        msg.layout.dim = {left,right};
+
+        msg.data = { setPoint*17.0f,-1.0f*setPoint*17.0f};
 
         setPoint += increment;
 
-        if(setPoint >= 0.9 || setPoint <= 0.1)
+        if(setPoint >= 1|| setPoint <= -1)
         {
             increment *= -1;
         }
 
-        ROS_INFO("Setting %f,%f", msgLeft.data,msgRight.data);
+        //ROS_INFO("Setting %f,%f", msgLeft.data,msgRight.data);
+        ROS_INFO("Setting %f,%f", msg.data[0],msg.data[1]);
 
         /**
          * The publish() function is how you send messages. The parameter
@@ -107,8 +130,9 @@ int main(int argc, char **argv)
          * given as a template parameter to the advertise<>() call, as was done
          * in the constructor above.
          */
-        left_pub.publish(msgLeft);
-        right_pub.publish(msgRight);
+        //left_pub.publish(msgLeft);
+        //right_pub.publish(msgRight);
+        pub.publish(msg);
 
         ros::spinOnce();
 

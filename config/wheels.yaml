@@ -1,25 +1,5 @@
-robopi:
-  gpio_wheels:
-    #from gpio wiring
-    left_front_wheel_joint:
-      en: 21
-      inF: 20
-      inB: 16
-    left_back_wheel_joint:
-      en: 21
-      inF: 20
-      inB: 16
-    right_front_wheel_joint:
-      en: 13
-      inF: 19
-      inB: 26
-    right_back_wheel_joint:
-      en: 13
-      inF: 19
-      inB: 26
-
 joint_limits:
-  wheel_left:
+  left__wheel_joint:
     has_position_limits: false
     has_velocity_limits: true
     min_velocity: -16.7551608
@@ -38,7 +18,7 @@ joint_limits:
     soft_upper_limit: 15.0
     k_position: 10.0
     k_velocity: 10.0
-  wheel_right:
+  right__wheel_joint:
     has_position_limits: false
     has_velocity_limits: true
     min_velocity: -16.7551608

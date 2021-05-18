@@ -8,7 +8,7 @@
 #include <ros/publisher.h>
 #include <ros/node_handle.h>
 
-#include "robopi_drivers/robopi_drivers.h"
+//#include "robopi_drivers/robopi_drivers.h"
 
 
 int main(int argc, char **argv)
@@ -38,7 +38,7 @@ int main(int argc, char **argv)
     range_left.max_range = 4.0;
 
 
-    robopi::SonarHcsr04 sonar(n.param("robopi/sonar/trigger",6),n.param("robopi/sonar/echo",12));
+    //robopi::SonarHcsr04 sonar(n.param("robopi/sonar/trigger",6),n.param("robopi/sonar/echo",12));
 
     while (ros::ok())
     {
@@ -46,7 +46,7 @@ int main(int argc, char **argv)
         loop_rate.sleep();
 
         range_left.header.stamp = ros::Time::now();
-        range_left.range = sonar.measure().distance();
+   //     range_left.range = sonar.measure().distance();
         pub_range_left.publish(range_left);
 
     }

@@ -2,8 +2,8 @@
 // Created by phil on 22.03.20.
 //
 
-#ifndef VACUUMPI_H
-#define VACUUMPI_H
+#ifndef ACTUATOR_INTERFACE_VELOCITY_H
+#define ACTUATOR_INTERFACE_VELOCITY_H
 
 #include <hardware_interface/joint_state_interface.h>
 #include <hardware_interface/joint_command_interface.h>
@@ -15,42 +15,40 @@
 #include <controller_manager/controller_manager.h>
 #include <boost/scoped_ptr.hpp>
 #include <ros/ros.h>
-#include <robopi_drivers/robopi_drivers.h>
 #include <thread>
+#include "SerialProtocol.h"
+
 using namespace hardware_interface;
 using joint_limits_interface::JointLimits;
 using joint_limits_interface::SoftJointLimits;
 using joint_limits_interface::PositionJointSoftLimitsHandle;
 using joint_limits_interface::PositionJointSoftLimitsInterface;
 
-
-class ActuatorInterfaceEffort : public hardware_interface::RobotHW{
+class HardwareInterfaceArduino : public hardware_interface::RobotHW{
 public:
-    explicit ActuatorInterfaceEffort(ros::NodeHandle& nh);
-    ~ActuatorInterfaceEffort() = default;
+    explicit HardwareInterfaceArduino(ros::NodeHandle& nh);
+    ~HardwareInterfaceArduino() = default;
     void init();
     void update(const ros::TimerEvent& e);
-    void read();
-    void write(ros::Duration elapsed_time);
 
 protected:
-    std::map<std::string,robopi::MotorLn298> _wheels;
+    SerialProtocol _serial;
+    std::string _deviceName;
     std::vector<double> _jointEffort,_jointPosition,_jointVelocity;
-    std::vector<double> _jointEffortCommand;
+    std::vector<double> _jointVelocityCommand;
     ros::NodeHandle _nh;
     ros::Timer _nonRealTimeLoop;
     ros::Duration control_period_;
     ros::Duration _elapsedTime;
     JointStateInterface _jointStateInterface;
-    EffortJointInterface _effortJointInterface;
-    joint_limits_interface::EffortJointSoftLimitsInterface _effortJointSoftLimitInterface;
+    VelocityJointInterface _velocityJointInterface;
+    joint_limits_interface::VelocityJointSoftLimitsInterface _velocityJointSoftLimitInterface;
     int _numJoints;
     std::vector<std::string> _wheelNames;
     double _loopHz;
     std::shared_ptr<controller_manager::ControllerManager> _ctrlManager;
     double p_error_, v_error_, e_error_;
-
 };
 
 
-#endif //SRC_VACUUMPI_H
+#endif //ACTUATOR_INTERFACE_VELOCITY_H

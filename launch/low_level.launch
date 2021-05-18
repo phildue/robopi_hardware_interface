@@ -12,8 +12,8 @@
 
     <group if="$(eval arg('start_hardware_interface') == true)">
         <arg name="node_start_delay" default="5.0" />
-        <node name="actuator_interface" pkg="robopi_low_level_control" type="actuator_interface_node" output="screen"/>
-        <node name="sonar" pkg="robopi_low_level_control" type="sonar_node" output="screen"/>
+        <node name="hardware_interface" pkg="robopi_low_level" type="hardware_interface_node" output="screen"/>
+     <!--   <node name="sonar" pkg="robopi_low_level" type="sonar_node" output="screen"/> -->
     </group>
 
 

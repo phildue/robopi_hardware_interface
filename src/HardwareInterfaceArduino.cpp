@@ -2,38 +2,32 @@
 // Created by phil on 22.03.20.
 //
 
-#include "ActuatorInterfaceVelocity.h"
+#include <std_msgs/Float32MultiArray.h>
+#include "HardwareInterfaceArduino.h"
 
-//TODO move this to config
-constexpr int enA = 21;
-constexpr int enB = 13;
-constexpr int in1 = 20;
-constexpr int in2 = 16;
-constexpr int in3 = 26;
-constexpr int in4 = 19;
 
-ActuatorInterfaceVelocity::ActuatorInterfaceVelocity(ros::NodeHandle &nh) : _nh(nh)
+HardwareInterfaceArduino::HardwareInterfaceArduino(ros::NodeHandle &nh) : _nh(nh)
                                                             {
     init();
     _ctrlManager.reset(new controller_manager::ControllerManager(this, _nh));
-    _nh.param("/robopi/actuator_interface/loop_hz", _loopHz, 0.1);
+    _nh.param("/robopi/hardware_interface_arduino/loop_hz", _loopHz, 0.1);
+    _deviceName = "/dev/ttyACM0";
+    _nh.param("/robopi/hardware_interface_arduino/device_name",_deviceName);
+    _serial._serialPort.SetDevice(_deviceName);
+    _serial._serialPort.SetBaudRate(mn::CppLinuxSerial::BaudRate::B_9600);
+    _serial._serialPort.SetTimeout(100);
+    _serial._serialPort.Open();
     ros::Duration update_freq = ros::Duration(1.0 / _loopHz);
-    _nonRealTimeLoop = _nh.createTimer(update_freq, &ActuatorInterfaceVelocity::update, this);
-
+    _nonRealTimeLoop = _nh.createTimer(update_freq, &HardwareInterfaceArduino::update, this);
 
 }
 
-void ActuatorInterfaceVelocity::init()
+void HardwareInterfaceArduino::init()
 {
-    _nh.getParam("/robopi/actuator_interface/wheels", _wheelNames);
+    _nh.getParam("/robopi/hardware_interface_arduino/wheels", _wheelNames);
     for(const auto &wheelName : _wheelNames)
     {
         ROS_INFO("Found wheel: [%s]",wheelName.c_str());
-        int en,inF,inB;
-        _nh.getParam("/robopi/gpio_wheels/" + wheelName + "/en", en);
-        _nh.getParam("/robopi/gpio_wheels/" + wheelName + "/inF", inF);
-        _nh.getParam("/robopi/gpio_wheels/" + wheelName + "/inB", inB);
-        _wheels.insert({wheelName, robopi::MotorLn298(inF, inB, en)});
     }
     _numJoints = _wheelNames.size();
 
@@ -67,25 +61,34 @@ void ActuatorInterfaceVelocity::init()
     ROS_INFO("Registered joint velocity limits interface");
 }
 
-void ActuatorInterfaceVelocity::update(const ros::TimerEvent& e) {
+void HardwareInterfaceArduino::update(const ros::TimerEvent& e) {
 
     _elapsedTime = ros::Duration(e.current_real - e.last_real);
-    //ROS_INFO("Update [%d]: (%f,%f)",_elapsedTime.nsec,_jointEffortCommand[0],_jointEffortCommand[1]);
-    read();
-    _ctrlManager->update(ros::Time::now(), _elapsedTime);
-    write(_elapsedTime);
-}
-
-void ActuatorInterfaceVelocity::read() {
-    for (int i = 0; i < _numJoints; i++) {
-        _jointVelocity[i] = _jointVelocityCommand[i];
-    }}
-
-void ActuatorInterfaceVelocity::write(ros::Duration elapsed_time) {
-    _velocityJointSoftLimitInterface.enforceLimits(elapsed_time);
-    for (int i = 0; i < _numJoints; i++) {
-        _wheels.find(_wheelNames[i])->second.set(_jointVelocityCommand[i]);
-        _jointVelocity[i] = _jointVelocityCommand[i];
-        _jointPosition[i] += _jointVelocity[i] * elapsed_time.toSec();
+    _serial.read(10);
+    if ( ! _serial._messagesState.empty() )
+    {
+        std::shared_ptr<SerialProtocol::MsgState> msg = _serial._messagesState[_serial._messagesState.size() - 1];
+        _jointVelocity[0] = msg->_stateLeft.angularVelocity;
+        _jointVelocity[1] = msg->_stateRight.angularVelocity;
+        _jointPosition[0] = msg->_stateLeft.wheelTicks * M_PI/10;
+        _jointPosition[1] = msg->_stateRight.wheelTicks * M_PI/10;
+      //  ROS_INFO( "Message:\n %s", msg->str().c_str());
     }
+    _serial.clear();
+
+
+    //ROS_INFO("Update [%d]: (%f,%f)",_elapsedTime.nsec,_jointEffortCommand[0],_jointEffortCommand[1]);
+    _ctrlManager->update(ros::Time::now(), _elapsedTime);
+    _velocityJointSoftLimitInterface.enforceLimits(_elapsedTime);
+
+    if (_jointVelocityCommand[0] != 0 || _jointVelocityCommand[1] != 0)
+    {
+        _serial.send( std::make_shared<SerialProtocol::MsgCmdVel>(_jointVelocityCommand[0],_jointVelocityCommand[1]) );
+
+    }
+
+
 }
+
+
+

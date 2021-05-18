@@ -13,6 +13,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
   std_msgs
+  sensor_msgs
   tf
 )
 
@@ -123,39 +124,32 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-set(COMPILE_FOR_PI CACHE BOOL ON "Enable if compiled on raspberry pi")
-
-add_subdirectory(src/robopi_drivers)
+add_subdirectory(src/CppLinuxSerial)
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/diff_drive_node.cpp)
-add_executable(actuator_interface_node src/actuator_interface_node.cpp src/ActuatorInterfaceEffort.cpp src/ActuatorInterfaceEffort.h src/ActuatorInterfaceVelocity.h src/ActuatorInterfaceVelocity.cpp)
-add_executable(test_publisher_node src/test_publisher_node.cpp)
-add_executable(gpio_motor_node src/gpio_motor_node.cpp)
+add_executable(hardware_interface_node src/hardware_interface_node.cpp src/HardwareInterfaceArduino.h src/HardwareInterfaceArduino.cpp src/SerialProtocol.h src/SerialProtocol.cpp)
+#add_executable(test_publisher_node src/test_publisher_node.cpp)
 add_executable(motor_cmd_pub_node src/motor_cmd_pub_node.cpp)
-add_executable(sonar_node src/sonar_node.cpp)
+#add_executable(sonar_node src/sonar_node.cpp)
 
-target_link_libraries(actuator_interface_node
+target_link_libraries(hardware_interface_node
+        CppLinuxSerial
         ${catkin_LIBRARIES}
-        robopi_drivers
         )
-target_link_libraries(test_publisher_node
-        ${catkin_LIBRARIES}
-        robopi_drivers
-        )
-target_link_libraries(gpio_motor_node
-        ${catkin_LIBRARIES}
-        robopi_drivers
-        )
+#target_link_libraries(test_publisher_node
+#        ${catkin_LIBRARIES}
+#        robopi_drivers-lib
+#        )
+
 target_link_libraries(motor_cmd_pub_node
         ${catkin_LIBRARIES}
-        robopi_drivers
         )
-target_link_libraries(sonar_node
-        ${catkin_LIBRARIES}
-        robopi_drivers
-        )
+#target_link_libraries(sonar_node
+#        ${catkin_LIBRARIES}
+#        robopi_drivers-lib
+#        )
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
