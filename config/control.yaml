@@ -6,8 +6,6 @@ robopi:
      left_wheel: ['left__wheel_joint']
      right_wheel: ['right__wheel_joint']
 
-     wheel_separation: 0.22
-     wheel_radius: 0.055
      # Odometry covariances for the encoder output of the robot. These values should
      # be tuned to your robot's sample odometry data, but these values are a good place
      # to start
@@ -21,13 +19,15 @@ robopi:
      linear:
        x:
          has_velocity_limits    : true
-         max_velocity           : 1  # m/s
+         max_velocity           : 0.5  # m/s
+         min_velocity           : -0.5
          has_acceleration_limits: true
          max_acceleration       : 3   # m/s^2
      angular:
        z:
          has_velocity_limits    : true
          max_velocity           : 1   # rad/s
+         min_velocity           : -1
          has_acceleration_limits: true
          max_acceleration       : 3   # rad/s^2
 

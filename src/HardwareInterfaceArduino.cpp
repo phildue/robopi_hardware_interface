@@ -15,7 +15,7 @@ HardwareInterfaceArduino::HardwareInterfaceArduino(ros::NodeHandle &nh) : _nh(nh
     _nh.param("/robopi/hardware_interface_arduino/device_name",_deviceName);
     _serial._serialPort.SetDevice(_deviceName);
     _serial._serialPort.SetBaudRate(mn::CppLinuxSerial::BaudRate::B_9600);
-    _serial._serialPort.SetTimeout(100);
+    _serial._serialPort.SetTimeout(10);
     _serial._serialPort.Open();
     ros::Duration update_freq = ros::Duration(1.0 / _loopHz);
     _nonRealTimeLoop = _nh.createTimer(update_freq, &HardwareInterfaceArduino::update, this);
@@ -64,15 +64,22 @@ void HardwareInterfaceArduino::init()
 void HardwareInterfaceArduino::update(const ros::TimerEvent& e) {
 
     _elapsedTime = ros::Duration(e.current_real - e.last_real);
-    _serial.read(10);
+    try{
+        _serial.read(1);
+
+    }catch(const SerialProtocol::ParseError& e)
+    {
+        ROS_ERROR("SerialProtocol::ParserError:: %s [%s]",e.what(),e._parsedMessage.c_str());
+
+    }
     if ( ! _serial._messagesState.empty() )
     {
-        std::shared_ptr<SerialProtocol::MsgState> msg = _serial._messagesState[_serial._messagesState.size() - 1];
+        std::shared_ptr<const SerialProtocol::MsgState> msg = _serial._messagesState[_serial._messagesState.size() - 1];
         _jointVelocity[0] = msg->_stateLeft.angularVelocity;
         _jointVelocity[1] = msg->_stateRight.angularVelocity;
-        _jointPosition[0] = msg->_stateLeft.wheelTicks * M_PI/10;
-        _jointPosition[1] = msg->_stateRight.wheelTicks * M_PI/10;
-      //  ROS_INFO( "Message:\n %s", msg->str().c_str());
+        _jointPosition[0] = msg->_stateLeft.position;
+        _jointPosition[1] = msg->_stateRight.position;
+        ROS_INFO( "Message:\n %s", msg->str().c_str());
     }
     _serial.clear();
 
@@ -83,7 +90,7 @@ void HardwareInterfaceArduino::update(const ros::TimerEvent& e) {
 
     if (_jointVelocityCommand[0] != 0 || _jointVelocityCommand[1] != 0)
     {
-        _serial.send( std::make_shared<SerialProtocol::MsgCmdVel>(_jointVelocityCommand[0],_jointVelocityCommand[1]) );
+        _serial.send( std::make_shared<SerialProtocol::MsgCmdVel>(_jointVelocityCommand[0],_jointVelocityCommand[1],e.current_real.toNSec() /1000));
 
     }
 

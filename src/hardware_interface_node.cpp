@@ -7,7 +7,7 @@
 #include <ros/callback_queue.h>
 #include <ros/ros.h>
 int main(int argc, char** argv) {
-    ros::init(argc, argv, "actuator_interface");
+    ros::init(argc, argv, "hardware_interface");
     ros::CallbackQueue callbackQueue;
     ros::NodeHandle nh;
     nh.setCallbackQueue(&callbackQueue);

@@ -16,8 +16,8 @@ joint_limits:
     has_soft_limits: true
     soft_lower_limit: -15.0
     soft_upper_limit: 15.0
-    k_position: 10.0
-    k_velocity: 10.0
+    k_position: 1.0
+    k_velocity: 0.0001
   right__wheel_joint:
     has_position_limits: false
     has_velocity_limits: true
@@ -35,5 +35,5 @@ joint_limits:
     has_soft_limits: true
     soft_lower_limit: -15.0
     soft_upper_limit: 15.0
-    k_position: 10.0
-    k_velocity: 10.0
+    k_position: 0.01
+    k_velocity: 0.0001
