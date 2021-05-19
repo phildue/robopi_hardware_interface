@@ -1,3 +1,3 @@
 [submodule "src/CppLinuxSerial"]
 	path = src/CppLinuxSerial
-	url = git@github.com:gbmhunter/CppLinuxSerial.git
+	url = https://github.com/phildue/CppLinuxSerial.git
