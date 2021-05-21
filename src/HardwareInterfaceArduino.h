@@ -29,8 +29,9 @@ public:
     explicit HardwareInterfaceArduino(ros::NodeHandle& nh);
     ~HardwareInterfaceArduino() = default;
     void init();
+    void read(const ros::TimerEvent& e);
     void update(const ros::TimerEvent& e);
-
+    void write(const ros::TimerEvent& e);
 protected:
     SerialProtocol _serial;
     std::string _deviceName;

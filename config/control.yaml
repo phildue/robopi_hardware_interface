@@ -2,6 +2,8 @@ robopi:
   diff_drive_controller:
      type: "diff_drive_controller/DiffDriveController"
      publish_rate: 50
+     publish_cmd: true
+     enable_odom_tf: true
 
      left_wheel: ['left__wheel_joint']
      right_wheel: ['right__wheel_joint']

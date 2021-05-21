@@ -64,6 +64,19 @@ void HardwareInterfaceArduino::init()
 void HardwareInterfaceArduino::update(const ros::TimerEvent& e) {
 
     _elapsedTime = ros::Duration(e.current_real - e.last_real);
+
+    read(e);
+    //ROS_INFO("Update [%d]: (%f,%f)",_elapsedTime.nsec,_jointEffortCommand[0],_jointEffortCommand[1]);
+    _ctrlManager->update(ros::Time::now(), _elapsedTime);
+    _velocityJointSoftLimitInterface.enforceLimits(_elapsedTime);
+    write(e);
+
+
+
+}
+
+void HardwareInterfaceArduino::read(const ros::TimerEvent &e) {
+
     try{
         _serial.read(1);
 
@@ -77,24 +90,20 @@ void HardwareInterfaceArduino::update(const ros::TimerEvent& e) {
         std::shared_ptr<const SerialProtocol::MsgState> msg = _serial._messagesState[_serial._messagesState.size() - 1];
         _jointVelocity[0] = msg->_stateLeft.angularVelocity;
         _jointVelocity[1] = msg->_stateRight.angularVelocity;
-        _jointPosition[0] = msg->_stateLeft.position;
-        _jointPosition[1] = msg->_stateRight.position;
-        ROS_INFO( "Message:\n %s", msg->str().c_str());
+        _jointPosition[0] += msg->_stateLeft.angularVelocity * _elapsedTime.toSec();
+        _jointPosition[1] += msg->_stateRight.angularVelocity * _elapsedTime.toSec();
+        //ROS_INFO( "Message:\n %s", msg->str().c_str());
     }
     _serial.clear();
 
+}
 
-    //ROS_INFO("Update [%d]: (%f,%f)",_elapsedTime.nsec,_jointEffortCommand[0],_jointEffortCommand[1]);
-    _ctrlManager->update(ros::Time::now(), _elapsedTime);
-    _velocityJointSoftLimitInterface.enforceLimits(_elapsedTime);
-
+void HardwareInterfaceArduino::write(const ros::TimerEvent &e) {
     if (_jointVelocityCommand[0] != 0 || _jointVelocityCommand[1] != 0)
     {
         _serial.send( std::make_shared<SerialProtocol::MsgCmdVel>(_jointVelocityCommand[0],_jointVelocityCommand[1],e.current_real.toNSec() /1000));
 
     }
-
-
 }
 
 
