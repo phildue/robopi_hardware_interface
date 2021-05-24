@@ -21,17 +21,17 @@ robopi:
      linear:
        x:
          has_velocity_limits    : true
-         max_velocity           : 0.5  # m/s
-         min_velocity           : -0.5
+         max_velocity           : 0.1  # m/s
+         # min_velocity           : defaults to -*max velocity
          has_acceleration_limits: true
-         max_acceleration       : 3   # m/s^2
+         max_acceleration       : 0.5   # m/s^2
      angular:
        z:
          has_velocity_limits    : true
          max_velocity           : 1   # rad/s
-         min_velocity           : -1
+         # min_velocity           : defaults to -*max velocity
          has_acceleration_limits: true
-         max_acceleration       : 3   # rad/s^2
+         max_acceleration       : 0.5   # rad/s^2
 
   joint_state_controller:
     type: "joint_state_controller/JointStateController"
