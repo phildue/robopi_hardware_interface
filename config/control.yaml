@@ -37,7 +37,8 @@ robopi:
     type: "joint_state_controller/JointStateController"
     publish_rate: 50
 
-  hardware_interface_arduino:
+  wheel_interface:
+    publish_wheel_command: true
     loop_hz: 50 # hz
     device_name : "/dev/ttyACM0"
     wheels:

@@ -24,19 +24,20 @@ using joint_limits_interface::SoftJointLimits;
 using joint_limits_interface::PositionJointSoftLimitsHandle;
 using joint_limits_interface::PositionJointSoftLimitsInterface;
 
-class HardwareInterfaceArduino : public hardware_interface::RobotHW{
+class WheelInterface : public hardware_interface::RobotHW{
 public:
-    explicit HardwareInterfaceArduino(ros::NodeHandle& nh);
-    ~HardwareInterfaceArduino() = default;
+    explicit WheelInterface(ros::NodeHandle& nh);
+    ~WheelInterface() = default;
     void init();
     void read(const ros::TimerEvent& e);
     void update(const ros::TimerEvent& e);
     void write(const ros::TimerEvent& e);
 protected:
+    bool _publishWheelCommand;
     SerialProtocol _serial;
     std::string _deviceName;
     std::vector<double> _jointEffort,_jointPosition,_jointVelocity;
-    std::vector<double> _jointVelocityCommand;
+    std::vector<double> _jointVelocityCommand,_jointVelocityCommandExecuted;
     ros::NodeHandle _nh;
     ros::Timer _nonRealTimeLoop;
     ros::Duration control_period_;
@@ -49,6 +50,7 @@ protected:
     double _loopHz;
     std::shared_ptr<controller_manager::ControllerManager> _ctrlManager;
     double p_error_, v_error_, e_error_;
+    ros::Publisher _pubWheelCommand;
 };
 
 

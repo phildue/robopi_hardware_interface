@@ -129,7 +129,7 @@ add_subdirectory(src/CppLinuxSerial)
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
 # add_executable(${PROJECT_NAME}_node src/diff_drive_node.cpp)
-add_executable(hardware_interface_node src/hardware_interface_node.cpp src/HardwareInterfaceArduino.h src/HardwareInterfaceArduino.cpp src/SerialProtocol.h src/SerialProtocol.cpp)
+add_executable(hardware_interface_node src/hardware_interface_node.cpp src/WheelInterface.h src/WheelInterface.cpp src/SerialProtocol.h src/SerialProtocol.cpp)
 #add_executable(test_publisher_node src/test_publisher_node.cpp)
 add_executable(motor_cmd_pub_node src/motor_cmd_pub_node.cpp)
 #add_executable(sonar_node src/sonar_node.cpp)

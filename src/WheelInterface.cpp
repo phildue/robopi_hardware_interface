@@ -3,28 +3,33 @@
 //
 
 #include <std_msgs/Float32MultiArray.h>
-#include "HardwareInterfaceArduino.h"
+#include "WheelInterface.h"
 
 
-HardwareInterfaceArduino::HardwareInterfaceArduino(ros::NodeHandle &nh) : _nh(nh)
+WheelInterface::WheelInterface(ros::NodeHandle &nh) : _nh(nh)
                                                             {
     init();
     _ctrlManager.reset(new controller_manager::ControllerManager(this, _nh));
-    _nh.param("/robopi/hardware_interface_arduino/loop_hz", _loopHz, 0.1);
+    _nh.param("/robopi/wheel_interface/loop_hz", _loopHz, 0.1);
     _deviceName = "/dev/ttyACM0";
-    _nh.param("/robopi/hardware_interface_arduino/device_name",_deviceName);
+    _nh.param("/robopi/wheel_interface/device_name",_deviceName);
     _serial._serialPort.SetDevice(_deviceName);
     _serial._serialPort.SetBaudRate(mn::CppLinuxSerial::BaudRate::B_9600);
     _serial._serialPort.SetTimeout(10);
     _serial._serialPort.Open();
     ros::Duration update_freq = ros::Duration(1.0 / _loopHz);
-    _nonRealTimeLoop = _nh.createTimer(update_freq, &HardwareInterfaceArduino::update, this);
+    _nh.param("/robopi/wheel_interface/publish_wheel_command",_publishWheelCommand,true);
+    _nonRealTimeLoop = _nh.createTimer(update_freq, &WheelInterface::update, this);
+    if ( _publishWheelCommand )
+    {
+        _pubWheelCommand = _nh.advertise<std_msgs::Float32MultiArray>("/robopi/diff_drive_controller/cmd_wheel",10);
 
+    }
 }
 
-void HardwareInterfaceArduino::init()
+void WheelInterface::init()
 {
-    _nh.getParam("/robopi/hardware_interface_arduino/wheels", _wheelNames);
+    _nh.getParam("/robopi/wheel_interface/wheels", _wheelNames);
     for(const auto &wheelName : _wheelNames)
     {
         ROS_INFO("Found wheel: [%s]",wheelName.c_str());
@@ -61,7 +66,7 @@ void HardwareInterfaceArduino::init()
     ROS_INFO("Registered joint velocity limits interface");
 }
 
-void HardwareInterfaceArduino::update(const ros::TimerEvent& e) {
+void WheelInterface::update(const ros::TimerEvent& e) {
 
     _elapsedTime = ros::Duration(e.current_real - e.last_real);
 
@@ -71,11 +76,29 @@ void HardwareInterfaceArduino::update(const ros::TimerEvent& e) {
     _velocityJointSoftLimitInterface.enforceLimits(_elapsedTime);
     write(e);
 
+    if ( _publishWheelCommand )
+    {
+        std_msgs::Float32MultiArray msg;
+        std_msgs::MultiArrayDimension dl,dr;
+        dl.size = 2;
+        dl.stride = 1;
+        dl.label = "wheel_left";
+        dr.size = 2;
+        dr.stride = 1;
+        dr.label = "wheel_right";
+        msg.layout.dim.push_back(dl);
+        msg.layout.dim.push_back(dr);
+        msg.data.push_back(_jointVelocityCommand[0]);
+        msg.data.push_back(_jointVelocityCommandExecuted[0]);
+        msg.data.push_back(_jointVelocityCommand[1]);
+        msg.data.push_back(_jointVelocityCommandExecuted[1]);
+        _pubWheelCommand.publish(msg);
+    }
 
 
 }
 
-void HardwareInterfaceArduino::read(const ros::TimerEvent &e) {
+void WheelInterface::read(const ros::TimerEvent &e) {
 
     try{
         _serial.read(1);
@@ -92,6 +115,8 @@ void HardwareInterfaceArduino::read(const ros::TimerEvent &e) {
         _jointVelocity[1] = msg->_stateRight.angularVelocity;
         _jointPosition[0] = msg->_stateLeft.position;
         _jointPosition[1] = msg->_stateRight.position;
+        _jointVelocityCommandExecuted[0] = msg->_stateLeft.angularVelocityCmd;
+        _jointVelocityCommandExecuted[1] = msg->_stateRight.angularVelocityCmd;
 //        _jointPosition[0] += msg->_stateLeft.angularVelocity * _elapsedTime.toSec();
 //        _jointPosition[1] += msg->_stateRight.angularVelocity * _elapsedTime.toSec();
         //ROS_INFO( "Message:\n %s", msg->str().c_str());
@@ -100,7 +125,7 @@ void HardwareInterfaceArduino::read(const ros::TimerEvent &e) {
 
 }
 
-void HardwareInterfaceArduino::write(const ros::TimerEvent &e) {
+void WheelInterface::write(const ros::TimerEvent &e) {
     if (_jointVelocityCommand[0] != 0 || _jointVelocityCommand[1] != 0)
     {
         _serial.send( std::make_shared<SerialProtocol::MsgCmdVel>(_jointVelocityCommand[0],_jointVelocityCommand[1],e.current_real.toNSec() /1000));
