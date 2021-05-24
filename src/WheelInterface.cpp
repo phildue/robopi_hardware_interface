@@ -18,14 +18,16 @@ WheelInterface::WheelInterface(ros::NodeHandle &nh) : _nh(nh)
     _serial._serialPort.SetBaudRate(mn::CppLinuxSerial::BaudRate::B_9600);
     _serial._serialPort.SetTimeout(10);
     _serial._serialPort.Open();
-    ros::Duration update_freq = ros::Duration(1.0 / _loopHz);
     _nh.param("/robopi/wheel_interface/publish_wheel_command",_publishWheelCommand,true);
-    _nonRealTimeLoop = _nh.createTimer(update_freq, &WheelInterface::update, this);
+
     if ( _publishWheelCommand )
     {
         _pubWheelCommand = _nh.advertise<std_msgs::Float32MultiArray>("/robopi/diff_drive_controller/cmd_wheel",10);
-
     }
+
+    ros::Duration update_freq = ros::Duration(1.0 / _loopHz);
+    _nonRealTimeLoop = _nh.createTimer(update_freq, &WheelInterface::update, this);
+
 }
 
 void WheelInterface::init()
