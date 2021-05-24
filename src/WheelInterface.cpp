@@ -3,6 +3,7 @@
 //
 
 #include <std_msgs/Float32MultiArray.h>
+#include <chrono>
 #include "WheelInterface.h"
 
 
@@ -70,7 +71,10 @@ void WheelInterface::init()
 void WheelInterface::update(const ros::TimerEvent& e) {
 
     _elapsedTime = ros::Duration(e.current_real - e.last_real);
-
+    if ( _elapsedTime.toSec() > 1.0/_loopHz + 1.0/_loopHz*0.1 )//more than 10% off
+    {
+       ROS_WARN("Wheel interface is missing its desired loop of %f, actual time was %f",1.0/_loopHz,_elapsedTime.toSec());
+     }
     read(e);
     _ctrlManager->update(ros::Time::now(), _elapsedTime);
     _velocityJointSoftLimitInterface.enforceLimits(_elapsedTime);
@@ -99,7 +103,7 @@ void WheelInterface::update(const ros::TimerEvent& e) {
 }
 
 void WheelInterface::read(const ros::TimerEvent &e) {
-
+//    auto start = std::chrono::system_clock::now();
     try{
         _serial.read(1);
 
@@ -119,18 +123,24 @@ void WheelInterface::read(const ros::TimerEvent &e) {
         _jointVelocityCommandExecuted[RIGHT] = msg->_stateRight.angularVelocityCmd;
 //        _jointPosition[0] += msg->_stateLeft.angularVelocity * _elapsedTime.toSec();
 //        _jointPosition[1] += msg->_stateRight.angularVelocity * _elapsedTime.toSec();
-        //ROS_INFO( "Message:\n %s", msg->str().c_str());
+//        ROS_INFO( "Message:\n %s", msg->str().c_str());
     }
     _serial.clear();
-
+//   auto end = std::chrono::system_clock::now();
+//   ROS_INFO("Read: %f",(double)std::chrono::duration_cast<std::chrono::milliseconds>((end-start)).count());
 }
 
 void WheelInterface::write(const ros::TimerEvent &e) {
+//    auto start = std::chrono::system_clock::now();
+    auto msgOut = std::make_shared<SerialProtocol::MsgCmdVel>(_jointVelocityCommand[LEFT],_jointVelocityCommand[RIGHT],0);
     if (_jointVelocityCommand[LEFT] != 0 || _jointVelocityCommand[RIGHT] != 0)
     {
-        _serial.send( std::make_shared<SerialProtocol::MsgCmdVel>(_jointVelocityCommand[LEFT],_jointVelocityCommand[RIGHT],e.current_real.toNSec() /1000));
+        _serial.send( msgOut );
 
     }
+   auto end = std::chrono::system_clock::now();
+//   ROS_INFO("Message: %s",msgOut->str().c_str());
+//   ROS_INFO("Write: %f",(double)std::chrono::duration_cast<std::chrono::milliseconds>((end-start)).count());
 }
 
 
