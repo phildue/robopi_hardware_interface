@@ -32,6 +32,9 @@ public:
     void read(const ros::TimerEvent& e);
     void update(const ros::TimerEvent& e);
     void write(const ros::TimerEvent& e);
+    constexpr int LEFT = 0;
+    constexpr int RIGHT = 0;
+
 protected:
     bool _publishWheelCommand;
     SerialProtocol _serial;

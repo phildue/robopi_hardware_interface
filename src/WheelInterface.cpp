@@ -40,6 +40,7 @@ void WheelInterface::init()
     _jointPosition.resize(_numJoints);
     _jointVelocity.resize(_numJoints);
     _jointVelocityCommand.resize(_numJoints);
+    _jointVelocityCommandExecuted.resize(_numJoints);
     for (int i = 0; i < _numJoints; ++i) {
 
         JointStateHandle jointStateHandle(_wheelNames[i], &_jointPosition[i], &_jointVelocity[i], &_jointEffort[i]);
@@ -71,7 +72,6 @@ void WheelInterface::update(const ros::TimerEvent& e) {
     _elapsedTime = ros::Duration(e.current_real - e.last_real);
 
     read(e);
-    //ROS_INFO("Update [%d]: (%f,%f)",_elapsedTime.nsec,_jointEffortCommand[0],_jointEffortCommand[1]);
     _ctrlManager->update(ros::Time::now(), _elapsedTime);
     _velocityJointSoftLimitInterface.enforceLimits(_elapsedTime);
     write(e);
@@ -88,10 +88,10 @@ void WheelInterface::update(const ros::TimerEvent& e) {
         dr.label = "wheel_right";
         msg.layout.dim.push_back(dl);
         msg.layout.dim.push_back(dr);
-        msg.data.push_back(_jointVelocityCommand[0]);
-        msg.data.push_back(_jointVelocityCommandExecuted[0]);
-        msg.data.push_back(_jointVelocityCommand[1]);
-        msg.data.push_back(_jointVelocityCommandExecuted[1]);
+        msg.data.push_back(_jointVelocityCommand[LEFT]);
+        msg.data.push_back(_jointVelocityCommandExecuted[LEFT]);
+        msg.data.push_back(_jointVelocityCommand[RIGHT]);
+        msg.data.push_back(_jointVelocityCommandExecuted[RIGHT]);
         _pubWheelCommand.publish(msg);
     }
 
@@ -111,12 +111,12 @@ void WheelInterface::read(const ros::TimerEvent &e) {
     if ( ! _serial._messagesState.empty() )
     {
         std::shared_ptr<const SerialProtocol::MsgState> msg = _serial._messagesState[_serial._messagesState.size() - 1];
-        _jointVelocity[0] = msg->_stateLeft.angularVelocity;
-        _jointVelocity[1] = msg->_stateRight.angularVelocity;
-        _jointPosition[0] = msg->_stateLeft.position;
-        _jointPosition[1] = msg->_stateRight.position;
-        _jointVelocityCommandExecuted[0] = msg->_stateLeft.angularVelocityCmd;
-        _jointVelocityCommandExecuted[1] = msg->_stateRight.angularVelocityCmd;
+        _jointVelocity[LEFT] = msg->_stateLeft.angularVelocity;
+        _jointVelocity[RIGHT] = msg->_stateRight.angularVelocity;
+        _jointPosition[LEFT] = msg->_stateLeft.position;
+        _jointPosition[RIGHT] = msg->_stateRight.position;
+        _jointVelocityCommandExecuted[LEFT] = msg->_stateLeft.angularVelocityCmd;
+        _jointVelocityCommandExecuted[RIGHT] = msg->_stateRight.angularVelocityCmd;
 //        _jointPosition[0] += msg->_stateLeft.angularVelocity * _elapsedTime.toSec();
 //        _jointPosition[1] += msg->_stateRight.angularVelocity * _elapsedTime.toSec();
         //ROS_INFO( "Message:\n %s", msg->str().c_str());
@@ -126,9 +126,9 @@ void WheelInterface::read(const ros::TimerEvent &e) {
 }
 
 void WheelInterface::write(const ros::TimerEvent &e) {
-    if (_jointVelocityCommand[0] != 0 || _jointVelocityCommand[1] != 0)
+    if (_jointVelocityCommand[LEFT] != 0 || _jointVelocityCommand[RIGHT] != 0)
     {
-        _serial.send( std::make_shared<SerialProtocol::MsgCmdVel>(_jointVelocityCommand[0],_jointVelocityCommand[1],e.current_real.toNSec() /1000));
+        _serial.send( std::make_shared<SerialProtocol::MsgCmdVel>(_jointVelocityCommand[LEFT],_jointVelocityCommand[RIGHT],e.current_real.toNSec() /1000));
 
     }
 }
