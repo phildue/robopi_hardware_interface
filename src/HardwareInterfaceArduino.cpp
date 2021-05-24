@@ -90,8 +90,10 @@ void HardwareInterfaceArduino::read(const ros::TimerEvent &e) {
         std::shared_ptr<const SerialProtocol::MsgState> msg = _serial._messagesState[_serial._messagesState.size() - 1];
         _jointVelocity[0] = msg->_stateLeft.angularVelocity;
         _jointVelocity[1] = msg->_stateRight.angularVelocity;
-        _jointPosition[0] += msg->_stateLeft.angularVelocity * _elapsedTime.toSec();
-        _jointPosition[1] += msg->_stateRight.angularVelocity * _elapsedTime.toSec();
+        _jointPosition[0] = msg->_stateLeft.position;
+        _jointPosition[1] = msg->_stateRight.position;
+//        _jointPosition[0] += msg->_stateLeft.angularVelocity * _elapsedTime.toSec();
+//        _jointPosition[1] += msg->_stateRight.angularVelocity * _elapsedTime.toSec();
         //ROS_INFO( "Message:\n %s", msg->str().c_str());
     }
     _serial.clear();
