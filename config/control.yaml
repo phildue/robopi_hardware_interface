@@ -4,7 +4,7 @@ robopi:
      publish_rate: 25
      publish_cmd: true
      enable_odom_tf: true
-     velocity_rolling_window_size: 20
+     velocity_rolling_window_size: 10
 
      left_wheel: ['left__wheel_joint']
      right_wheel: ['right__wheel_joint']

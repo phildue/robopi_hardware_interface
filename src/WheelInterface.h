@@ -43,7 +43,7 @@ protected:
     std::vector<double> _jointVelocityCommand,_jointVelocityCommandExecuted;
     ros::NodeHandle _nh;
     ros::Timer _nonRealTimeLoop;
-    ros::Duration control_period_;
+    ros::Duration _controlPeriod;
     ros::Duration _elapsedTime;
     JointStateInterface _jointStateInterface;
     VelocityJointInterface _velocityJointInterface;
